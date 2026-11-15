@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#7B1C1C">
+<title>Fitxar · La Pau</title>
+<link rel="icon" href="https://raw.githubusercontent.com/joseroldantapia1967-pixel/comandes/ccr-1a93f0e5-qffuh2/icones/icona-lapau-192.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/joseroldantapia1967-pixel/comandes/ccr-1a93f0e5-qffuh2/icones/icona-lapau-192.png">
+<style>
+:root{--bordo:#7B1C1C;--or:#C9A84C;--crema:#FDF6EC;--tinta:#2B1B16;--suau:#6E5A50;--ok:#2E7D32;--bad:#C62828;--linia:#E8DCC6}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--crema);color:var(--tinta);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--linia)}
+header a{color:var(--bordo);font-weight:700;text-decoration:none;font-size:.95rem}
+header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
+.tipus{margin:14px 14px 10px;border-radius:18px;color:#fff;text-align:center;padding:12px 8px}
+.tipus.E{background:var(--ok)}.tipus.S{background:var(--bad)}
+.tipus h1{margin:0;font-family:Georgia,serif;font-size:2rem;letter-spacing:.05em}
+.tipus p{margin:2px 0 0;font-weight:600}
+.visor{position:relative;margin:0 14px;border-radius:18px;overflow:hidden;background:#111;aspect-ratio:3/4;max-height:62vh;max-width:520px;margin-left:auto;margin-right:auto}
+.visor video{width:100%;height:100%;object-fit:cover;display:block}
+.marc{position:absolute;inset:16%;border:4px solid rgba(255,255,255,.95);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.35)}
+.marc.ok{border-color:#7CFC8A}
+.estat{text-align:center;margin:12px 16px;font-size:1.05rem;font-weight:600;min-height:1.5em}
+.estat.bad{color:var(--bad)}
+.caixa{margin:12px 14px;background:#fff;border:1px solid var(--linia);border-radius:14px;padding:14px;display:none}
+.caixa.on{display:block}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border-radius:12px;border:1px solid var(--bordo);background:#fff;color:var(--bordo);font-weight:700;font-size:1rem;margin-top:10px;cursor:pointer;text-decoration:none}
+.btn.p{background:var(--bordo);color:#fff}
+.btn.E{background:var(--ok);border-color:var(--ok);color:#fff}.btn.S{background:var(--bad);border-color:var(--bad);color:#fff}
+.peu{text-align:center;font-size:.75rem;color:var(--suau);margin:18px 10px 24px}
+.peu i{color:var(--bordo)}
+.amaga{display:none!important}
+</style>
+</head>
+<body>
+<header><a id="torna" href="#">‹ <span id="tTorna">Portal</span></a><b>La Pau</b><span style="width:60px"></span></header>
+<div class="tipus" id="tipus"><h1 id="tTitol">ENTRADA</h1><p id="tSub">Bon servei</p></div>
+<div class="visor" id="visor"><video id="v" playsinline muted autoplay></video><div class="marc" id="marc"></div></div>
+<div class="estat" id="estat" role="status" aria-live="polite"></div>
+<div class="caixa" id="altre"><div id="altreTxt"></div><a class="btn" id="altreSi" href="#"></a><button class="btn" id="altreNo" type="button"></button></div>
+<div class="caixa" id="sense"><div id="senseTxt"></div><label class="btn p" for="foto" id="fotoBtn"></label><input id="foto" type="file" accept="image/*" capture="environment" class="amaga"><button class="btn" id="reintenta" type="button"></button></div>
+<div class="peu">creat per <i>joseroldan_app_gastroconsentido</i> · gastroconsentido@gmail.com · 648182627 💬 WhatsApp</div>
+<script>
+(function(){
+var PORTAL='https://script.google.com/macros/s/AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K/exec';
+var IDS=['AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K','AKfycbzT51eAh2pUZDiUmSsuvWi6tGPRGjYr9yexkrt5eeXMyD4lAIfJcyT_TXwyEAXj8KW4'];
+var q=new URLSearchParams(location.search),F=(q.get('f')||'E').toUpperCase()==='S'?'S':'E';
+var L=(q.get('l')||(navigator.language||'ca')).slice(0,2)==='es'?'es':'ca';
+var T={
+ ca:{torna:'Portal',E:'ENTRADA',S:'SORTIDA',Es:'Bon servei',Ss:'Bon descans',apunta:"Apunta al QR d'{t} de la paret",obrint:"QR llegit ✓ Obrint el fitxatge…",
+  altre:"Aquest és el QR de {t}.",altreSi:"Sí, fitxa la {t}",altreNo:"No, torna a escanejar",alie:"Aquest QR no és el de fitxar de La Pau.",
+  sense:"No s'ha pogut obrir la càmera. Dona permís a la càmera per a aquesta pàgina o fes una foto del QR.",foto:"📷 Fes una foto del QR",reintenta:"Torna-ho a provar",
+  llegint:"Llegint la foto…",noLlegit:"No he pogut llegir el QR. Fes la foto més a prop, amb llum i que surti sencer.",engegant:"Obrint la càmera…",entrada:"entrada",sortida:"sortida"},
+ es:{torna:'Portal',E:'ENTRADA',S:'SALIDA',Es:'Buen servicio',Ss:'Buen descanso',apunta:"Apunta al QR de {t} de la pared",obrint:"QR leído ✓ Abriendo el fichaje…",
+  altre:"Este es el QR de {t}.",altreSi:"Sí, fichar la {t}",altreNo:"No, volver a escanear",alie:"Este QR no es el de fichar de La Pau.",
+  sense:"No se ha podido abrir la cámara. Da permiso a la cámara para esta página o haz una foto del QR.",foto:"📷 Haz una foto del QR",reintenta:"Volver a probar",
+  llegint:"Leyendo la foto…",noLlegit:"No he podido leer el QR. Haz la foto más cerca, con luz y que salga entero.",engegant:"Abriendo la cámara…",entrada:"entrada",sortida:"salida"}
+}[L];
+var $=function(id){return document.getElementById(id)};
+var nom=function(k){return k==='E'?T.entrada:T.sortida};
+document.documentElement.lang=L;
+$('torna').href=PORTAL+'?authuser=0';$('tTorna').textContent=T.torna;
+$('tipus').className='tipus '+F;$('tTitol').textContent=T[F];$('tSub').textContent=T[F+'s'];
+$('fotoBtn').textContent=T.foto;$('reintenta').textContent=T.reintenta;$('senseTxt').textContent=T.sense;
+var estat=function(m,bad){var e=$('estat');e.textContent=m;e.className='estat'+(bad?' bad':'')};
+var video=$('v'),stream=null,actiu=false,det=null,cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),avisT=0;
+
+function analitza(txt){
+  var m=String(txt||'').trim();
+  try{var u=new URL(m)}catch(e){return null}
+  if(u.hostname!=='script.google.com')return null;
+  if(!IDS.some(function(id){return u.pathname.indexOf('/'+id+'/')>-1}))return null;
+  var f=(u.searchParams.get('f')||'').toUpperCase();
+  return f==='E'||f==='S'?{f:f,url:m}:null;
+}
+function obre(r){actiu=false;atura();$('marc').className='marc ok';estat(T.obrint);location.replace(r.url)}
+function llegit(txt){
+  var r=analitza(txt);
+  if(!r){if(Date.now()-avisT>2500){avisT=Date.now();estat(T.alie,true);setTimeout(function(){if(actiu)estat(T.apunta.replace('{t}',nom(F)))},2500)}return false}
+  if(r.f===F){obre(r);return true}
+  actiu=false;estat('');
+  $('altreTxt').textContent=T.altre.replace('{t}',T[r.f]);
+  var si=$('altreSi');si.textContent=T.altreSi.replace('{t}',nom(r.f));si.className='btn '+r.f;si.href=r.url;
+  si.onclick=function(ev){ev.preventDefault();obre(r)};
+  $('altreNo').textContent=T.altreNo;$('altreNo').onclick=function(){$('altre').className='caixa';actiu=true;estat(T.apunta.replace('{t}',nom(F)));bucle()};
+  $('altre').className='caixa on';return true;
+}
+function carregaJsQR(){return new Promise(function(ok,ko){if(window.jsQR)return ok();var s=document.createElement('script');s.src='jsQR.js';s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
+function llegeixCanvas(img,w,h){
+  var k=Math.min(1,800/Math.max(w,h));cv.width=Math.round(w*k);cv.height=Math.round(h*k);
+  cx.drawImage(img,0,0,cv.width,cv.height);
+  var d=cx.getImageData(0,0,cv.width,cv.height),c=window.jsQR&&jsQR(d.data,d.width,d.height,{inversionAttempts:'attemptBoth'});
+  return c?c.data:null;
+}
+function bucle(){
+  if(!actiu)return;
+  if(video.readyState<2){return setTimeout(bucle,150)}
+  if(det){det.detect(video).then(function(cs){if(!actiu)return;for(var i=0;i<cs.length;i++){if(llegit(cs[i].rawValue))return}setTimeout(bucle,120)}).catch(function(){det=null;carregaJsQR().then(bucle)});return}
+  var t=llegeixCanvas(video,video.videoWidth,video.videoHeight);
+  if(t&&llegit(t))return;
+  setTimeout(bucle,120);
+}
+function atura(){if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}}
+function senseCamera(){actiu=false;atura();$('visor').classList.add('amaga');$('sense').className='caixa on';estat('')}
+function engega(){
+  $('sense').className='caixa';$('visor').classList.remove('amaga');estat(T.engegant);
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return senseCamera();
+  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(s){
+    stream=s;video.srcObject=s;var p=video.play();if(p&&p.catch)p.catch(function(){});
+    actiu=true;estat(T.apunta.replace('{t}',nom(F)));
+    var usaDet=function(){bucle()};
+    if('BarcodeDetector' in window){BarcodeDetector.getSupportedFormats().then(function(fs){if(fs.indexOf('qr_code')>-1)det=new BarcodeDetector({formats:['qr_code']});return det?null:carregaJsQR()}).then(usaDet).catch(function(){carregaJsQR().then(usaDet)})}
+    else carregaJsQR().then(usaDet).catch(senseCamera);
+  }).catch(senseCamera);
+}
+$('reintenta').onclick=engega;
+$('foto').onchange=function(){
+  var f=this.files&&this.files[0];if(!f)return;estat(T.llegint);
+  carregaJsQR().then(function(){
+    var im=new Image();im.onload=function(){var t=llegeixCanvas(im,im.naturalWidth,im.naturalHeight);URL.revokeObjectURL(im.src);if(!t||!llegit(t))estat(T.noLlegit,true)};
+    im.onerror=function(){estat(T.noLlegit,true)};im.src=URL.createObjectURL(f);
+  });
+  this.value='';
+};
+document.addEventListener('visibilitychange',function(){if(document.hidden){actiu=false;atura()}else if(!stream&&$('sense').className.indexOf('on')<0&&$('altre').className.indexOf('on')<0)engega()});
+engega();
+})();
+</script>
+</body>
+</html>
