@@ -74,7 +74,10 @@ function analitza(txt){
   if(u.hostname!=='script.google.com')return null;
   if(!IDS.some(function(id){return u.pathname.indexOf('/'+id+'/')>-1}))return null;
   var f=(u.searchParams.get('f')||'').toUpperCase();
-  return f==='E'||f==='S'?{f:f,url:m}:null;
+  if(f!=='E'&&f!=='S')return null;
+  /* v2 · 18/11/2026 · drecera: el QR del Portal obre directament el fitxatge de Torns (una càrrega de pàgina menys) */
+  if(u.pathname.indexOf('/'+IDS[0]+'/')>-1)return {f:f,url:'https://script.google.com/macros/s/'+IDS[1]+'/exec?v=perfil&f='+f+'&authuser=0'};
+  return {f:f,url:m};
 }
 function obre(r){actiu=false;atura();$('marc').className='marc ok';estat(T.obrint);location.replace(r.url)}
 function llegit(txt){
