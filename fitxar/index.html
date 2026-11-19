@@ -27,6 +27,7 @@ header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
 .estat.bad{color:var(--bad)}
 .caixa{margin:12px 14px;background:#fff;border:1px solid var(--linia);border-radius:14px;padding:14px;display:none}
 .caixa.on{display:block}
+.fet .visor{display:none}
 .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border-radius:12px;border:1px solid var(--bordo);background:#fff;color:var(--bordo);font-weight:700;font-size:1rem;margin-top:10px;cursor:pointer;text-decoration:none}
 .btn.p{background:var(--bordo);color:#fff}
 .btn.E{background:var(--ok);border-color:var(--ok);color:#fff}.btn.S{background:var(--bad);border-color:var(--bad);color:#fff}
@@ -41,6 +42,7 @@ header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
 <div class="visor" id="visor"><video id="v" playsinline muted autoplay></video><div class="marc" id="marc"></div></div>
 <div class="estat" id="estat" role="status" aria-live="polite"></div>
 <div class="caixa" id="altre"><div id="altreTxt"></div><a class="btn" id="altreSi" href="#"></a><button class="btn" id="altreNo" type="button"></button></div>
+<div class="caixa" id="fet" style="text-align:center"><div id="fetIco" style="font-size:52px;line-height:1.1"></div><div id="fetTit" style="font-size:1.4rem;font-weight:700"></div><div id="fetHora" style="font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums"></div><div id="fetTxt" style="font-size:1.05rem;margin-top:6px"></div><button class="btn p" id="fetTorna" type="button"></button><a class="btn" id="fetPortal" href="#"></a></div>
 <div class="caixa" id="sense"><div id="senseTxt"></div><label class="btn p" for="foto" id="fotoBtn"></label><input id="foto" type="file" accept="image/*" capture="environment" class="amaga"><button class="btn" id="reintenta" type="button"></button></div>
 <div class="peu">creat per <i>joseroldan_app_gastroconsentido</i> · gastroconsentido@gmail.com · 648182627 💬 WhatsApp</div>
 <script>
@@ -53,13 +55,22 @@ var T={
  ca:{torna:'Portal',E:'ENTRADA',S:'SORTIDA',Es:'Bon servei',Ss:'Bon descans',apunta:"Apunta al QR d'{t} de la paret",obrint:"QR llegit ✓ Obrint el fitxatge…",
   altre:"Aquest és el QR de {t}.",altreSi:"Sí, fitxa la {t}",altreNo:"No, torna a escanejar",alie:"Aquest QR no és el de fitxar de La Pau.",
   sense:"No s'ha pogut obrir la càmera. Dona permís a la càmera per a aquesta pàgina o fes una foto del QR.",foto:"📷 Fes una foto del QR",reintenta:"Torna-ho a provar",
-  llegint:"Llegint la foto…",noLlegit:"No he pogut llegir el QR. Fes la foto més a prop, amb llum i que surti sencer.",engegant:"Obrint la càmera…",entrada:"entrada",sortida:"sortida"},
+  llegint:"Llegint la foto…",noLlegit:"No he pogut llegir el QR. Fes la foto més a prop, amb llum i que surti sencer.",engegant:"Obrint la càmera…",entrada:"entrada",sortida:"sortida",
+  fitxant:"QR llegit ✓ Fitxant…",okE:"ENTRADA fitxada",okS:"SORTIDA fitxada",bonE:"Que tinguis bon servei{n}!",bonS:"Que tinguis bon descans{n}!",no:"No s'ha pogut fitxar",reprova:"Torna-ho a provar",portal:"El meu widget"},
  es:{torna:'Portal',E:'ENTRADA',S:'SALIDA',Es:'Buen servicio',Ss:'Buen descanso',apunta:"Apunta al QR de {t} de la pared",obrint:"QR leído ✓ Abriendo el fichaje…",
   altre:"Este es el QR de {t}.",altreSi:"Sí, fichar la {t}",altreNo:"No, volver a escanear",alie:"Este QR no es el de fichar de La Pau.",
   sense:"No se ha podido abrir la cámara. Da permiso a la cámara para esta página o haz una foto del QR.",foto:"📷 Haz una foto del QR",reintenta:"Volver a probar",
-  llegint:"Leyendo la foto…",noLlegit:"No he podido leer el QR. Haz la foto más cerca, con luz y que salga entero.",engegant:"Abriendo la cámara…",entrada:"entrada",sortida:"salida"}
+  llegint:"Leyendo la foto…",noLlegit:"No he podido leer el QR. Haz la foto más cerca, con luz y que salga entero.",engegant:"Abriendo la cámara…",entrada:"entrada",sortida:"salida",
+  fitxant:"QR leído ✓ Fichando…",okE:"ENTRADA fichada",okS:"SALIDA fichada",bonE:"¡Que tengas buen servicio{n}!",bonS:"¡Que tengas buen descanso{n}!",no:"No se ha podido fichar",reprova:"Volver a probar",portal:"Mi widget"}
 }[L];
 var $=function(id){return document.getElementById(id)};
+/* v3 · 19/11/2026 · fitxatge directe: el Portal passa la seva sessió (?k=); es desa en aquest mòbil i no cal tornar a entrar ni rebre codi */
+var K='';try{K=q.get('k')||localStorage.getItem('lp_fitx_k')||'';if(q.get('k'))localStorage.setItem('lp_fitx_k',K)}catch(e){K=q.get('k')||''}
+if(q.get('k')&&history.replaceState){q.delete('k');history.replaceState(null,'',location.pathname+'?'+q.toString())}
+var GEO=null;function geo(){if(GEO)return GEO;GEO=new Promise(function(res){if(!navigator.geolocation)return res({err:'aquest dispositiu no dona la ubicació'});
+  var fi=false,ok=function(o){if(!fi){fi=true;res(o)}};setTimeout(function(){ok({err:'ubicació no disponible'})},9000);
+  navigator.geolocation.getCurrentPosition(function(p){ok({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy})},function(e){ok({err:e.code===1?'permís d’ubicació denegat':'ubicació no disponible'})},{enableHighAccuracy:true,timeout:8000,maximumAge:60000})});return GEO}
+if(K)geo();
 var nom=function(k){return k==='E'?T.entrada:T.sortida};
 document.documentElement.lang=L;
 $('torna').href=PORTAL+'?authuser=0';$('tTorna').textContent=T.torna;
@@ -79,7 +90,32 @@ function analitza(txt){
   if(u.pathname.indexOf('/'+IDS[0]+'/')>-1)return {f:f,url:'https://script.google.com/macros/s/'+IDS[1]+'/exec?v=perfil&f='+f+'&authuser=0'};
   return {f:f,url:m};
 }
-function obre(r){actiu=false;atura();$('marc').className='marc ok';estat(T.obrint);location.replace(r.url)}
+function portalF(f){return PORTAL+'?f='+f+'&authuser=0'}
+function obre(r){actiu=false;atura();$('marc').className='marc ok';$('altre').className='caixa';
+  if(K)return directe(r.f);
+  estat(T.obrint);location.replace(portalF(r.f))} /* v3 · sense sessió: el Portal (entra un sol cop i fitxa) */
+function directe(f){
+  estat(T.fitxant);
+  geo().then(function(pos){GEO=null;var d={tipus:f};for(var x in pos)d[x]=pos[x];
+    return fetch(PORTAL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({sid:K,accio:'fitxa',d:d}),redirect:'follow'}).then(function(r){return r.json()});
+  }).then(function(o){
+    if(o&&o.ok)return fet(true,o.r,f);
+    var e=String(o&&o.err||'');
+    if(/SESSIO/.test(e)){K='';try{localStorage.removeItem('lp_fitx_k')}catch(x){}estat(T.obrint);return location.replace(portalF(f))}
+    fet(false,e,f);
+  }).catch(function(){estat(T.obrint);location.replace(portalF(f))});
+}
+function fet(ok,r,f){
+  document.body.classList.add('fet');estat('');
+  var tp=ok?r.tipus:f,col=ok?(tp==='S'||tp==='P'?'var(--bad)':'var(--ok)'):'var(--bordo)';
+  $('fet').style.border='3px solid '+col;$('fetIco').textContent=ok?'✓':'⚠️';$('fetIco').style.color=col;$('fetTit').style.color=col;
+  $('fetTit').textContent=ok?(T['ok'+(tp==='S'||tp==='P'?'S':'E')]):T.no;
+  $('fetHora').textContent=ok?r.hora:'';
+  $('fetTxt').textContent=ok?(T[tp==='S'?'bonS':'bonE'].replace('{n}',r.nom?', '+r.nom:'')+(r.estat&&r.estat!=='ok'?' · '+r.estat:'')):String(r||'');
+  var b=$('fetTorna');b.style.display=ok?'none':'';b.textContent=T.reprova;b.onclick=function(){$('fet').className='caixa';document.body.classList.remove('fet');directe(f)};
+  var p=$('fetPortal');p.textContent=T.portal;p.href=PORTAL+'?w=1&authuser=0';
+  $('fet').className='caixa on';if(navigator.vibrate)try{navigator.vibrate(ok?80:[60,60,60])}catch(x){}
+}
 function llegit(txt){
   var r=analitza(txt);
   if(!r){if(Date.now()-avisT>2500){avisT=Date.now();estat(T.alie,true);setTimeout(function(){if(actiu)estat(T.apunta.replace('{t}',nom(F)))},2500)}return false}
