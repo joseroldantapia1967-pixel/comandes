@@ -53,7 +53,7 @@ header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
    ?f=E|S&go=1 → fitxa directament amb la clau, sense càmera
    ?f=E|S      → càmera per escanejar el QR de la paret
    Sense clau: avisa que cal vincular el mòbil (o entrar amb nom i correu al Portal). */
-var VERSIO='v4.1 · 21/11/2026';
+var VERSIO='v4.2 · 21/11/2026';
 var PORTAL='https://script.google.com/macros/s/AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K/exec';
 var IDS=['AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K','AKfycbzT51eAh2pUZDiUmSsuvWi6tGPRGjYr9yexkrt5eeXMyD4lAIfJcyT_TXwyEAXj8KW4'];
 var q=new URLSearchParams(location.search),F=(q.get('f')||'E').toUpperCase()==='S'?'S':'E',GO=q.get('go')==='1',VINCLE=q.get('vincle')||'';
@@ -247,7 +247,7 @@ window.addEventListener('online',function(){buidaCua().then(function(n){if(n)est
 
 /* INICI */
 if(VINCLE){$('tipus').style.display='none';vincular(VINCLE)}
-else if(!MOB&&!K)noVinculat(F);
+else if(!MOB&&!K){if(GO)location.replace(PORTAL+'?f='+F+'&l=1&authuser=0');else noVinculat(F)} /* v4.2 · mòbil sense vincular: directe al formulari de nom i correu, sense pantalles de més */
 else{
   if(GO)estat(T.fitxant);else{geo();engega()}
   /* primer s'envien els fitxatges guardats sense connexió, i després el d'ara (l'ordre importa) */
