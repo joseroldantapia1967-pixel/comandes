@@ -53,7 +53,7 @@ header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
    ?f=E|S&go=1 → fitxa directament amb la clau, sense càmera
    ?f=E|S      → càmera per escanejar el QR de la paret
    Sense clau: avisa que cal vincular el mòbil (o entrar amb nom i correu al Portal). */
-var VERSIO='v4 · 21/11/2026';
+var VERSIO='v4.1 · 21/11/2026';
 var PORTAL='https://script.google.com/macros/s/AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K/exec';
 var IDS=['AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K','AKfycbzT51eAh2pUZDiUmSsuvWi6tGPRGjYr9yexkrt5eeXMyD4lAIfJcyT_TXwyEAXj8KW4'];
 var q=new URLSearchParams(location.search),F=(q.get('f')||'E').toUpperCase()==='S'?'S':'E',GO=q.get('go')==='1',VINCLE=q.get('vincle')||'';
@@ -66,7 +66,7 @@ var T={
   fitxant:"Fitxant…",okE:"ENTRADA fitxada",okS:"SORTIDA fitxada",bonE:"Que tinguis bon servei{n}!",bonS:"Que tinguis bon descans{n}!",no:"No s'ha pogut fitxar",reprova:"Torna-ho a provar",portal:"El meu widget",
   desfes:"Desfés ({s})",desfet:"Fitxatge desfet",nouTit:"Aquest mòbil encara no està vinculat",nouTxt:"Demana a l'encarregat o encarregada el QR per vincular-lo (1 minut). Després, per fitxar només caldrà escanejar el QR de la paret.",
   nouLogin:"Ara no: entrar amb nom i correu",desv:"Aquest mòbil s'ha desvinculat. Demana a l'encarregat o encarregada un QR nou per vincular-lo.",
-  vinculant:"Vinculant el mòbil…",vOk:"Mòbil vinculat{n}!",vTxt:"A partir d'ara, per fitxar només cal escanejar amb la càmera el QR d'ENTRADA o de SORTIDA de la paret. Si et demana la ubicació, prem «Permetre».",vNo:"No s'ha pogut vincular",
+  vinculant:"Vinculant el mòbil…",vOk:"Mòbil vinculat{n}!",vTxt:"A partir d'ara, per fitxar només cal escanejar amb la càmera el QR d'ENTRADA o de SORTIDA de la paret. Si et demana la ubicació, prem «Permetre».",vNo:"No s'ha pogut vincular",vXarxa:"No hi ha connexió o el servidor no respon. Comprova la connexió i torna-ho a provar (el QR serveix 15 minuts).",
   cua:"Guardat al mòbil",cuaTxt:"No hi ha connexió. El fitxatge ({h}) s'enviarà sol quan tornis a obrir aquesta pàgina amb connexió.",cuaEnv:"{n} fitxatge(s) guardat(s) enviat(s) ✓",retard:"enviat amb retard",
   ubic:"Sense ubicació: el fitxatge s'ha desat amb un avís. Per activar-la: iPhone › Configuració › Privacitat › Localització › Safari › «Mentre s'usa»; Android › Chrome › ⋮ › Configuració › Configuració del lloc › Ubicació."},
  es:{torna:'Portal',E:'ENTRADA',S:'SALIDA',Es:'Buen servicio',Ss:'Buen descanso',apunta:"Apunta al QR de {t} de la pared",obrint:"QR leído ✓ Abriendo el fichaje…",
@@ -76,7 +76,7 @@ var T={
   fitxant:"Fichando…",okE:"ENTRADA fichada",okS:"SALIDA fichada",bonE:"¡Que tengas buen servicio{n}!",bonS:"¡Que tengas buen descanso{n}!",no:"No se ha podido fichar",reprova:"Volver a probar",portal:"Mi widget",
   desfes:"Deshacer ({s})",desfet:"Fichaje deshecho",nouTit:"Este móvil todavía no está vinculado",nouTxt:"Pide al encargado o encargada el QR para vincularlo (1 minuto). Después, para fichar solo habrá que escanear el QR de la pared.",
   nouLogin:"Ahora no: entrar con nombre y correo",desv:"Este móvil se ha desvinculado. Pide al encargado o encargada un QR nuevo para vincularlo.",
-  vinculant:"Vinculando el móvil…",vOk:"¡Móvil vinculado{n}!",vTxt:"A partir de ahora, para fichar solo hay que escanear con la cámara el QR de ENTRADA o de SALIDA de la pared. Si te pide la ubicación, pulsa «Permitir».",vNo:"No se ha podido vincular",
+  vinculant:"Vinculando el móvil…",vOk:"¡Móvil vinculado{n}!",vTxt:"A partir de ahora, para fichar solo hay que escanear con la cámara el QR de ENTRADA o de SALIDA de la pared. Si te pide la ubicación, pulsa «Permitir».",vNo:"No se ha podido vincular",vXarxa:"No hay conexión o el servidor no responde. Comprueba la conexión y vuelve a probar (el QR sirve 15 minutos).",
   cua:"Guardado en el móvil",cuaTxt:"No hay conexión. El fichaje ({h}) se enviará solo cuando vuelvas a abrir esta página con conexión.",cuaEnv:"{n} fichaje(s) guardado(s) enviado(s) ✓",retard:"enviado con retraso",
   ubic:"Sin ubicación: el fichaje se ha guardado con un aviso. Para activarla: iPhone › Ajustes › Privacidad › Localización › Safari › «Mientras se usa»; Android › Chrome › ⋮ › Configuración › Configuración de sitios › Ubicación."}
 }[L];
@@ -116,7 +116,7 @@ function vincular(codi){
     estat('');
     if(o.ok){MOB={t:o.r.t,nom:o.r.nom||''};ls.set('lp_mobil',JSON.stringify(MOB));ls.del('lp_fitx_k');
       mostra('✓','var(--ok)',T.vOk.replace('{n}',MOB.nom?', '+MOB.nom:''),'',T.vTxt);geo();}
-    else mostra('⚠️','var(--bordo)',T.vNo,'',o.xarxa?T.cuaTxt.replace('({h}) ',''):String(o.err||''));
+    else{mostra('⚠️','var(--bordo)',T.vNo,'',o.xarxa?T.vXarxa:String(o.err||''));if(o.xarxa){var b=$('fetTorna');b.style.display='';b.textContent=T.reprova;b.onclick=function(){vincular(codi)}}}
   });
 }
 /* COA SENSE CONNEXIÓ */
