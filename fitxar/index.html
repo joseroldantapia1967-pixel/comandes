@@ -42,36 +42,57 @@ header b{font-family:Georgia,serif;color:var(--bordo);font-size:1.05rem}
 <div class="visor" id="visor"><video id="v" playsinline muted autoplay></video><div class="marc" id="marc"></div></div>
 <div class="estat" id="estat" role="status" aria-live="polite"></div>
 <div class="caixa" id="altre"><div id="altreTxt"></div><a class="btn" id="altreSi" href="#"></a><button class="btn" id="altreNo" type="button"></button></div>
-<div class="caixa" id="fet" style="text-align:center"><div id="fetIco" style="font-size:52px;line-height:1.1"></div><div id="fetTit" style="font-size:1.4rem;font-weight:700"></div><div id="fetHora" style="font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums"></div><div id="fetTxt" style="font-size:1.05rem;margin-top:6px"></div><button class="btn p" id="fetTorna" type="button"></button><a class="btn" id="fetPortal" href="#"></a></div>
+<div class="caixa" id="fet" style="text-align:center"><div id="fetIco" style="font-size:52px;line-height:1.1"></div><div id="fetTit" style="font-size:1.4rem;font-weight:700"></div><div id="fetHora" style="font-size:2.6rem;font-weight:700;font-variant-numeric:tabular-nums"></div><div id="fetTxt" style="font-size:1.05rem;margin-top:6px"></div><button class="btn" id="fetDesfes" type="button"></button><button class="btn p" id="fetTorna" type="button"></button><a class="btn" id="fetPortal" href="#"></a></div>
+<div class="caixa" id="nou" style="text-align:center"><div id="nouIco" style="font-size:46px;line-height:1.1">📱</div><div id="nouTit" style="font-size:1.25rem;font-weight:700"></div><div id="nouTxt" style="margin-top:6px"></div><a class="btn" id="nouLogin" href="#"></a></div>
 <div class="caixa" id="sense"><div id="senseTxt"></div><label class="btn p" for="foto" id="fotoBtn"></label><input id="foto" type="file" accept="image/*" capture="environment" class="amaga"><button class="btn" id="reintenta" type="button"></button></div>
 <div class="peu">creat per <i>joseroldan_app_gastroconsentido</i> · gastroconsentido@gmail.com · 648182627 💬 WhatsApp</div>
 <script>
 (function(){
+/* v4 · 21/11/2026 · MÒBIL VINCULAT: el mòbil guarda una clau en aquesta pàgina (no a la finestra de Google, que l'iPhone esborra).
+   ?vincle=…  → vincula el mòbil (QR personal que ensenya RRHH)
+   ?f=E|S&go=1 → fitxa directament amb la clau, sense càmera
+   ?f=E|S      → càmera per escanejar el QR de la paret
+   Sense clau: avisa que cal vincular el mòbil (o entrar amb nom i correu al Portal). */
+var VERSIO='v4 · 21/11/2026';
 var PORTAL='https://script.google.com/macros/s/AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K/exec';
 var IDS=['AKfycbzBKAgzEM8BurnHzkv_t-RzGac5skuGW8HDFHYyFZ4Ki8mJ4iUr0fZLY5Jnu-64KT4K','AKfycbzT51eAh2pUZDiUmSsuvWi6tGPRGjYr9yexkrt5eeXMyD4lAIfJcyT_TXwyEAXj8KW4'];
-var q=new URLSearchParams(location.search),F=(q.get('f')||'E').toUpperCase()==='S'?'S':'E';
+var q=new URLSearchParams(location.search),F=(q.get('f')||'E').toUpperCase()==='S'?'S':'E',GO=q.get('go')==='1',VINCLE=q.get('vincle')||'';
 var L=(q.get('l')||(navigator.language||'ca')).slice(0,2)==='es'?'es':'ca';
 var T={
  ca:{torna:'Portal',E:'ENTRADA',S:'SORTIDA',Es:'Bon servei',Ss:'Bon descans',apunta:"Apunta al QR d'{t} de la paret",obrint:"QR llegit ✓ Obrint el fitxatge…",
   altre:"Aquest és el QR de {t}.",altreSi:"Sí, fitxa la {t}",altreNo:"No, torna a escanejar",alie:"Aquest QR no és el de fitxar de La Pau.",
   sense:"No s'ha pogut obrir la càmera. Dona permís a la càmera per a aquesta pàgina o fes una foto del QR.",foto:"📷 Fes una foto del QR",reintenta:"Torna-ho a provar",
   llegint:"Llegint la foto…",noLlegit:"No he pogut llegir el QR. Fes la foto més a prop, amb llum i que surti sencer.",engegant:"Obrint la càmera…",entrada:"entrada",sortida:"sortida",
-  fitxant:"QR llegit ✓ Fitxant…",okE:"ENTRADA fitxada",okS:"SORTIDA fitxada",bonE:"Que tinguis bon servei{n}!",bonS:"Que tinguis bon descans{n}!",no:"No s'ha pogut fitxar",reprova:"Torna-ho a provar",portal:"El meu widget"},
+  fitxant:"Fitxant…",okE:"ENTRADA fitxada",okS:"SORTIDA fitxada",bonE:"Que tinguis bon servei{n}!",bonS:"Que tinguis bon descans{n}!",no:"No s'ha pogut fitxar",reprova:"Torna-ho a provar",portal:"El meu widget",
+  desfes:"Desfés ({s})",desfet:"Fitxatge desfet",nouTit:"Aquest mòbil encara no està vinculat",nouTxt:"Demana a l'encarregat o encarregada el QR per vincular-lo (1 minut). Després, per fitxar només caldrà escanejar el QR de la paret.",
+  nouLogin:"Ara no: entrar amb nom i correu",desv:"Aquest mòbil s'ha desvinculat. Demana a l'encarregat o encarregada un QR nou per vincular-lo.",
+  vinculant:"Vinculant el mòbil…",vOk:"Mòbil vinculat{n}!",vTxt:"A partir d'ara, per fitxar només cal escanejar amb la càmera el QR d'ENTRADA o de SORTIDA de la paret. Si et demana la ubicació, prem «Permetre».",vNo:"No s'ha pogut vincular",
+  cua:"Guardat al mòbil",cuaTxt:"No hi ha connexió. El fitxatge ({h}) s'enviarà sol quan tornis a obrir aquesta pàgina amb connexió.",cuaEnv:"{n} fitxatge(s) guardat(s) enviat(s) ✓",retard:"enviat amb retard",
+  ubic:"Sense ubicació: el fitxatge s'ha desat amb un avís. Per activar-la: iPhone › Configuració › Privacitat › Localització › Safari › «Mentre s'usa»; Android › Chrome › ⋮ › Configuració › Configuració del lloc › Ubicació."},
  es:{torna:'Portal',E:'ENTRADA',S:'SALIDA',Es:'Buen servicio',Ss:'Buen descanso',apunta:"Apunta al QR de {t} de la pared",obrint:"QR leído ✓ Abriendo el fichaje…",
   altre:"Este es el QR de {t}.",altreSi:"Sí, fichar la {t}",altreNo:"No, volver a escanear",alie:"Este QR no es el de fichar de La Pau.",
   sense:"No se ha podido abrir la cámara. Da permiso a la cámara para esta página o haz una foto del QR.",foto:"📷 Haz una foto del QR",reintenta:"Volver a probar",
   llegint:"Leyendo la foto…",noLlegit:"No he podido leer el QR. Haz la foto más cerca, con luz y que salga entero.",engegant:"Abriendo la cámara…",entrada:"entrada",sortida:"salida",
-  fitxant:"QR leído ✓ Fichando…",okE:"ENTRADA fichada",okS:"SALIDA fichada",bonE:"¡Que tengas buen servicio{n}!",bonS:"¡Que tengas buen descanso{n}!",no:"No se ha podido fichar",reprova:"Volver a probar",portal:"Mi widget"}
+  fitxant:"Fichando…",okE:"ENTRADA fichada",okS:"SALIDA fichada",bonE:"¡Que tengas buen servicio{n}!",bonS:"¡Que tengas buen descanso{n}!",no:"No se ha podido fichar",reprova:"Volver a probar",portal:"Mi widget",
+  desfes:"Deshacer ({s})",desfet:"Fichaje deshecho",nouTit:"Este móvil todavía no está vinculado",nouTxt:"Pide al encargado o encargada el QR para vincularlo (1 minuto). Después, para fichar solo habrá que escanear el QR de la pared.",
+  nouLogin:"Ahora no: entrar con nombre y correo",desv:"Este móvil se ha desvinculado. Pide al encargado o encargada un QR nuevo para vincularlo.",
+  vinculant:"Vinculando el móvil…",vOk:"¡Móvil vinculado{n}!",vTxt:"A partir de ahora, para fichar solo hay que escanear con la cámara el QR de ENTRADA o de SALIDA de la pared. Si te pide la ubicación, pulsa «Permitir».",vNo:"No se ha podido vincular",
+  cua:"Guardado en el móvil",cuaTxt:"No hay conexión. El fichaje ({h}) se enviará solo cuando vuelvas a abrir esta página con conexión.",cuaEnv:"{n} fichaje(s) guardado(s) enviado(s) ✓",retard:"enviado con retraso",
+  ubic:"Sin ubicación: el fichaje se ha guardado con un aviso. Para activarla: iPhone › Ajustes › Privacidad › Localización › Safari › «Mientras se usa»; Android › Chrome › ⋮ › Configuración › Configuración de sitios › Ubicación."}
 }[L];
 var $=function(id){return document.getElementById(id)};
-/* v3 · 19/11/2026 · fitxatge directe: el Portal passa la seva sessió (?k=); es desa en aquest mòbil i no cal tornar a entrar ni rebre codi */
-var K='';try{K=q.get('k')||localStorage.getItem('lp_fitx_k')||'';if(q.get('k'))localStorage.setItem('lp_fitx_k',K)}catch(e){K=q.get('k')||''}
-if(q.get('k')&&history.replaceState){q.delete('k');history.replaceState(null,'',location.pathname+'?'+q.toString())}
+var ls={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}},del:function(k){try{localStorage.removeItem(k)}catch(e){}}};
+/* clau del mòbil */
+var MOB=null;try{MOB=JSON.parse(ls.get('lp_mobil')||'null')}catch(e){MOB=null}
+/* v3 · sessió del Portal (?k=) per a qui encara no té el mòbil vinculat */
+var K=q.get('k')||ls.get('lp_fitx_k')||'';if(q.get('k'))ls.set('lp_fitx_k',K);
+['k','vincle','go'].forEach(function(x){q.delete(x)});if(history.replaceState)history.replaceState(null,'',location.pathname+'?'+q.toString());
+var UA=String(navigator.userAgent||'').slice(0,200);
 var GEO=null;function geo(){if(GEO)return GEO;GEO=new Promise(function(res){if(!navigator.geolocation)return res({err:'aquest dispositiu no dona la ubicació'});
   var fi=false,ok=function(o){if(!fi){fi=true;res(o)}};setTimeout(function(){ok({err:'ubicació no disponible'})},9000);
   navigator.geolocation.getCurrentPosition(function(p){ok({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy})},function(e){ok({err:e.code===1?'permís d’ubicació denegat':'ubicació no disponible'})},{enableHighAccuracy:true,timeout:8000,maximumAge:60000})});return GEO}
-if(K)geo();
 var nom=function(k){return k==='E'?T.entrada:T.sortida};
+var pad=function(n){return ('0'+n).slice(-2)},hhmm=function(ts){var d=new Date(ts);return pad(d.getHours())+':'+pad(d.getMinutes())};
 document.documentElement.lang=L;
 $('torna').href=PORTAL+'?authuser=0';$('tTorna').textContent=T.torna;
 $('tipus').className='tipus '+F;$('tTitol').textContent=T[F];$('tSub').textContent=T[F+'s'];
@@ -79,50 +100,106 @@ $('fotoBtn').textContent=T.foto;$('reintenta').textContent=T.reintenta;$('senseT
 var estat=function(m,bad){var e=$('estat');e.textContent=m;e.className='estat'+(bad?' bad':'')};
 var video=$('v'),stream=null,actiu=false,det=null,cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),avisT=0;
 
-function analitza(txt){
-  var m=String(txt||'').trim();
-  try{var u=new URL(m)}catch(e){return null}
-  if(u.hostname!=='script.google.com')return null;
-  if(!IDS.some(function(id){return u.pathname.indexOf('/'+id+'/')>-1}))return null;
-  var f=(u.searchParams.get('f')||'').toUpperCase();
-  if(f!=='E'&&f!=='S')return null;
-  /* v2 · 18/11/2026 · drecera: el QR del Portal obre directament el fitxatge de Torns (una càrrega de pàgina menys) */
-  if(u.pathname.indexOf('/'+IDS[0]+'/')>-1)return {f:f,url:'https://script.google.com/macros/s/'+IDS[1]+'/exec?v=perfil&f='+f+'&authuser=0'};
-  return {f:f,url:m};
+/* crida al Portal (doPost). xarxa=true si no hi ha connexió */
+function post(accio,d){
+  return fetch(PORTAL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accio:accio,d:d}),redirect:'follow'})
+    .then(function(r){return r.json()},function(){return {ok:false,xarxa:true}})
+    .then(function(o){return o||{ok:false,xarxa:true}},function(){return {ok:false,xarxa:true}});
 }
-function portalF(f){return PORTAL+'?f='+f+'&authuser=0'}
-function obre(r){actiu=false;atura();$('marc').className='marc ok';$('altre').className='caixa';
-  if(K)return directe(r.f);
-  estat(T.obrint);location.replace(portalF(r.f))} /* v3 · sense sessió: el Portal (entra un sol cop i fitxa) */
+function amaga(){['altre','fet','sense','nou'].forEach(function(id){$(id).className='caixa'})}
+function pantalla(){document.body.classList.add('fet');actiu=false;atura();amaga();estat('')}
+
+/* VINCULAR (QR personal de RRHH) */
+function vincular(codi){
+  pantalla();estat(T.vinculant);
+  post('vincula',{codi:codi,ua:UA}).then(function(o){
+    estat('');
+    if(o.ok){MOB={t:o.r.t,nom:o.r.nom||''};ls.set('lp_mobil',JSON.stringify(MOB));ls.del('lp_fitx_k');
+      mostra('✓','var(--ok)',T.vOk.replace('{n}',MOB.nom?', '+MOB.nom:''),'',T.vTxt);geo();}
+    else mostra('⚠️','var(--bordo)',T.vNo,'',o.xarxa?T.cuaTxt.replace('({h}) ',''):String(o.err||''));
+  });
+}
+/* COA SENSE CONNEXIÓ */
+function cua(){try{return JSON.parse(ls.get('lp_cua')||'[]')}catch(e){return []}}
+function desaCua(c){if(c.length)ls.set('lp_cua',JSON.stringify(c));else ls.del('lp_cua')}
+function buidaCua(){
+  var c=cua();if(!MOB||!c.length)return Promise.resolve(0);var enviats=0;
+  var seg=function(){if(!c.length){desaCua(c);return enviats}var x=c[0];
+    return post('fitxaD',{t:MOB.t,tipus:x.tipus,lat:x.lat,lng:x.lng,acc:x.acc,err:x.err,ua:UA,cua:true,tc:x.tc}).then(function(o){
+      if(o.xarxa){desaCua(c);return enviats}
+      c.shift();if(o.ok)enviats++;return seg()})};
+  return seg();
+}
+/* FITXAR AMB EL MÒBIL VINCULAT */
+var desT=null;
 function directe(f){
-  estat(T.fitxant);
+  pantalla();estat(T.fitxant);var tc=Date.now();
+  if(!MOB)return K?legacy(f):noVinculat(f);
+  geo().then(function(pos){GEO=null;var d={t:MOB.t,tipus:f,ua:UA};for(var x in pos)d[x]=pos[x];
+    return post('fitxaD',d).then(function(o){
+      if(o.ok)return fet(true,o.r,f,pos);
+      if(o.xarxa){var c=cua();var it={tipus:f,tc:tc};for(var y in pos)it[y]=pos[y];c.push(it);desaCua(c);
+        return mostra('⏳','var(--or)',T.cua,hhmm(tc),T.cuaTxt.replace('{h}',hhmm(tc)))}
+      var e=String(o.err||'');
+      if(/MOBIL/.test(e)){ls.del('lp_mobil');MOB=null;return noVinculat(f,T.desv)}
+      fet(false,e,f);
+    });
+  });
+}
+/* v3 · amb la sessió del Portal (mòbils encara no vinculats) */
+function legacy(f){
   geo().then(function(pos){GEO=null;var d={tipus:f};for(var x in pos)d[x]=pos[x];
     return fetch(PORTAL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({sid:K,accio:'fitxa',d:d}),redirect:'follow'}).then(function(r){return r.json()});
   }).then(function(o){
     if(o&&o.ok)return fet(true,o.r,f);
     var e=String(o&&o.err||'');
-    if(/SESSIO/.test(e)){K='';try{localStorage.removeItem('lp_fitx_k')}catch(x){}estat(T.obrint);return location.replace(portalF(f))}
+    if(/SESSIO/.test(e)){K='';ls.del('lp_fitx_k');return noVinculat(f)}
     fet(false,e,f);
-  }).catch(function(){estat(T.obrint);location.replace(portalF(f))});
+  }).catch(function(){noVinculat(f)});
 }
-function fet(ok,r,f){
-  document.body.classList.add('fet');estat('');
+function noVinculat(f,txt){
+  pantalla();$('nouTit').textContent=T.nouTit;$('nouTxt').textContent=txt||T.nouTxt;
+  var a=$('nouLogin');a.textContent=T.nouLogin;a.href=PORTAL+'?f='+f+'&l=1&authuser=0';$('nou').className='caixa on';
+}
+function mostra(ico,col,tit,hora,txt){
+  document.body.classList.add('fet');amaga();estat('');
+  $('fet').style.border='3px solid '+col;$('fetIco').textContent=ico;$('fetIco').style.color=col;$('fetTit').style.color=col;
+  $('fetTit').textContent=tit;$('fetHora').textContent=hora||'';$('fetTxt').textContent=txt||'';
+  $('fetDesfes').style.display='none';$('fetTorna').style.display='none';
+  var p=$('fetPortal');p.textContent=T.portal;p.href=PORTAL+'?w=1&authuser=0';$('fet').className='caixa on';
+}
+function fet(ok,r,f,pos){
   var tp=ok?r.tipus:f,col=ok?(tp==='S'||tp==='P'?'var(--bad)':'var(--ok)'):'var(--bordo)';
-  $('fet').style.border='3px solid '+col;$('fetIco').textContent=ok?'✓':'⚠️';$('fetIco').style.color=col;$('fetTit').style.color=col;
-  $('fetTit').textContent=ok?(T['ok'+(tp==='S'||tp==='P'?'S':'E')]):T.no;
-  $('fetHora').textContent=ok?r.hora:'';
-  $('fetTxt').textContent=ok?(T[tp==='S'?'bonS':'bonE'].replace('{n}',r.nom?', '+r.nom:'')+(r.estat&&r.estat!=='ok'?' · '+r.estat:'')):String(r||'');
-  var b=$('fetTorna');b.style.display=ok?'none':'';b.textContent=T.reprova;b.onclick=function(){$('fet').className='caixa';document.body.classList.remove('fet');directe(f)};
-  var p=$('fetPortal');p.textContent=T.portal;p.href=PORTAL+'?w=1&authuser=0';
-  $('fet').className='caixa on';if(navigator.vibrate)try{navigator.vibrate(ok?80:[60,60,60])}catch(x){}
+  var txt=ok?(T[tp==='S'?'bonS':'bonE'].replace('{n}',r.nom?', '+r.nom:'')):String(r||'');
+  if(ok&&pos&&pos.err)txt+=' · '+T.ubic;else if(ok&&r.estat&&r.estat!=='ok')txt+=' · '+r.estat;
+  mostra(ok?'✓':'⚠️',col,ok?T['ok'+(tp==='S'||tp==='P'?'S':'E')]:T.no,ok?r.hora:'',txt);
+  var b=$('fetTorna');if(!ok){b.style.display='';b.textContent=T.reprova;b.onclick=function(){directe(f)}}
+  if(ok&&MOB&&r.ids&&r.ids.length){var dB=$('fetDesfes'),s=10;dB.style.display='';var pinta=function(){dB.textContent=T.desfes.replace('{s}',s)};pinta();clearInterval(desT);
+    desT=setInterval(function(){s--;if(s<=0){clearInterval(desT);dB.style.display='none'}else pinta()},1000);
+    dB.onclick=function(){clearInterval(desT);dB.disabled=true;post('desfes',{t:MOB.t,ids:r.ids}).then(function(o){dB.disabled=false;
+      if(o.ok)mostra('↩︎','var(--bordo)',T.desfet,'','');else{dB.style.display='none';$('fetTxt').textContent=String(o.err||T.no)}})}}
+  if(navigator.vibrate)try{navigator.vibrate(ok?80:[60,60,60])}catch(x){}
 }
+
+/* CÀMERA (escanejar el QR de la paret des d'aquesta pàgina) */
+function analitza(txt){
+  var m=String(txt||'').trim();
+  try{var u=new URL(m)}catch(e){return null}
+  if(u.hostname==='joseroldantapia1967-pixel.github.io'&&/\/fitxar\/?$/.test(u.pathname)){var g=(u.searchParams.get('f')||'').toUpperCase();return g==='E'||g==='S'?{f:g,url:m}:null}
+  if(u.hostname!=='script.google.com')return null;
+  if(!IDS.some(function(id){return u.pathname.indexOf('/'+id+'/')>-1}))return null;
+  var f=(u.searchParams.get('f')||'').toUpperCase();
+  if(f!=='E'&&f!=='S')return null;
+  return {f:f,url:m};
+}
+function obre(r){actiu=false;atura();$('marc').className='marc ok';$('altre').className='caixa';directe(r.f)}
 function llegit(txt){
   var r=analitza(txt);
   if(!r){if(Date.now()-avisT>2500){avisT=Date.now();estat(T.alie,true);setTimeout(function(){if(actiu)estat(T.apunta.replace('{t}',nom(F)))},2500)}return false}
   if(r.f===F){obre(r);return true}
   actiu=false;estat('');
   $('altreTxt').textContent=T.altre.replace('{t}',T[r.f]);
-  var si=$('altreSi');si.textContent=T.altreSi.replace('{t}',nom(r.f));si.className='btn '+r.f;si.href=r.url;
+  var si=$('altreSi');si.textContent=T.altreSi.replace('{t}',nom(r.f));si.className='btn '+r.f;si.href='#';
   si.onclick=function(ev){ev.preventDefault();obre(r)};
   $('altreNo').textContent=T.altreNo;$('altreNo').onclick=function(){$('altre').className='caixa';actiu=true;estat(T.apunta.replace('{t}',nom(F)));bucle()};
   $('altre').className='caixa on';return true;
@@ -145,6 +222,7 @@ function bucle(){
 function atura(){if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}}
 function senseCamera(){actiu=false;atura();$('visor').classList.add('amaga');$('sense').className='caixa on';estat('')}
 function engega(){
+  if(document.body.classList.contains('fet'))return;
   $('sense').className='caixa';$('visor').classList.remove('amaga');estat(T.engegant);
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)return senseCamera();
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(s){
@@ -164,8 +242,17 @@ $('foto').onchange=function(){
   });
   this.value='';
 };
-document.addEventListener('visibilitychange',function(){if(document.hidden){actiu=false;atura()}else if(!stream&&$('sense').className.indexOf('on')<0&&$('altre').className.indexOf('on')<0)engega()});
-engega();
+document.addEventListener('visibilitychange',function(){if(document.hidden){actiu=false;atura()}else if(!stream&&!document.body.classList.contains('fet')&&$('sense').className.indexOf('on')<0&&$('altre').className.indexOf('on')<0)engega()});
+window.addEventListener('online',function(){buidaCua().then(function(n){if(n)estat(T.cuaEnv.replace('{n}',n))})});
+
+/* INICI */
+if(VINCLE){$('tipus').style.display='none';vincular(VINCLE)}
+else if(!MOB&&!K)noVinculat(F);
+else{
+  if(GO)estat(T.fitxant);else{geo();engega()}
+  /* primer s'envien els fitxatges guardats sense connexió, i després el d'ara (l'ordre importa) */
+  buidaCua().then(function(n){if(GO)directe(F);if(n)setTimeout(function(){estat(T.cuaEnv.replace('{n}',n))},GO?0:1500)});
+}
 })();
 </script>
 </body>
